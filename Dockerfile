@@ -28,8 +28,11 @@ ENV FLEX_TEMPLATE_PYTHON_SETUP_FILE=${WORKDIR}/setup.py
 ENV FLEX_TEMPLATES_TAIL_CMD_TIMEOUT_IN_SECS=30
 ENV FLEX_TEMPLATES_NUM_LOG_LINES=1000
 
+COPY config config
 COPY . ${WORKDIR}
 
+RUN pip install --upgrade pip
 RUN pip install -U -r ${WORKDIR}/requirements.txt
+RUN ls ${WORKDIR}
 
 ENTRYPOINT ["/opt/apache/beam/boot"]

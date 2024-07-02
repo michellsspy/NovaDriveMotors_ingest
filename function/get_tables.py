@@ -10,7 +10,7 @@ class GetTables(beam.DoFn):
     def process(self, element):
         for table in element:
         # Parâmetros de conexão
-            with open('config/credentiales.json') as f:
+            with open('config/credentiales_db.json') as f:
                 config = json.load(f)
 
             # Definindo as variáveis de ambiente
@@ -41,7 +41,7 @@ class GetTables(beam.DoFn):
                 # Criar um cursor para executar consultas SQL
                 cursor = conn.cursor()
 
-                query = f"select * from {table} limit 10"
+                query = f"select * from {table}" # limit 10"
 
                 cursor.execute(query)
 
@@ -52,8 +52,8 @@ class GetTables(beam.DoFn):
                 df = pd.DataFrame(rows, columns=col_names)
 
                 # Altere pelo nome do seu bucket o o path da parta de destino dentro do bucket
-                bucket_name = 'bucket-postigres-dataflow'
-                path = f'data-postgres/{table}.parquet'
+                bucket_name = 'novadrive-motors'
+                path = f'landing/{table}.parquet'
 
                 client = storage.Client()
                 bucket = client.get_bucket(bucket_name)

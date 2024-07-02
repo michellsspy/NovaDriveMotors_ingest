@@ -10,7 +10,7 @@ from datetime import datetime
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(asctime)s - %(levelname)s - %(message)s")
 
-serveiceAccount = r'keys/dataflow-modelo-flex.json'
+serveiceAccount = r'keys/novadrive-motors-428216-64c36aa337b8.json'
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = serveiceAccount
 
 now = datetime.now()
@@ -19,13 +19,13 @@ formatted_datetime = now.strftime("%Y-%m-%d--%H-%M")
 def main(argv=None):
     options = PipelineOptions(
         flags=argv,
-        project='dataflow-modelo-flex',
+        project='novadrive-motors-428216',
         runner='DataflowRunner',
         streaming=False,
         job_name=f'conection-postgres-{formatted_datetime}',
-        temp_location ='gs://bucket-postigres-dataflow/temp',
-        staging_location ='gs://bucket-postigres-dataflow/staging',
-        template_location=f'gs://bucket-postigres-dataflow/templates/template-conection-postgres-{formatted_datetime}',
+        temp_location='gs://novadrive-motors/temp',
+        staging_location='gs://novadrive-motors/staging',
+        template_location=f'gs://novadrive-motors/templates/template-novadrive-ingest-{formatted_datetime}',
         autoscaling_algorithm='THROUGHPUT_BASED',
         worker_machine_type='n1-standard-4',
         service_account_key_file='./keys',
@@ -34,14 +34,19 @@ def main(argv=None):
         number_of_worker_harness_threads=2,
         disk_size_gb=50,
         region='southamerica-east1',
+        zone='southamerica-east1-c',
+        project_id='novadrive-motors-428216',
+        staging_bucket='novadrive-motors',
         save_main_session=True,
-        sdk_container_image='southamerica-east1-docker.pkg.dev/dataflow-modelo-flex/conection-postgres-oracle-v2/postgres-dev2:latest',
+        sdk_container_image='southamerica-east1-docker.pkg.dev/novadrive-motors-428216/ingest-novadrivemotors-v1/novadrive-dev:latest',
         sdk_location='container',
         requirements_file='./requirements.txt',
         metabase_file='./metadata.json',
         setup_file='./setup.py',
-        service_account_email='consulta-ddos-postgres@dataflow-modelo-flex.iam.gserviceaccount.com'
+        service_account_email='',
+        #subnetwork='https://www.googleapis.com/compute/v1/projects/novadrive-motors/regions/southamerica-east1/subnetworks/vpc-novadrive'
     )
+
 
     from function.get_names import GetNames
     from function.get_tables import GetTables

@@ -7,7 +7,7 @@ import logging
 class GetNames(beam.DoFn):
     def process(self, element):
         # Parâmetros de conexão
-        with open('config/credentiales.json') as f:
+        with open('config/credentiales_db.json') as f:
             config = json.load(f)
 
         # Definindo as variáveis de ambiente
