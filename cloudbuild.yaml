@@ -3,22 +3,78 @@ steps:
   - name: 'gcr.io/cloud-builders/git'
     args: ['clone', 'https://github.com/michellsspy/NovaDriveMotors_ingest.git', '.']
 
-  # Segundo passo: executar um script de build
+  # Segundo passo: criar o serviço de conta (se necessário)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Verifica se o serviço de conta já existe
+        if [[ -z "$(_SERVICE_ACCOUNT_EMAIL)" ]]; then
+          gcloud iam service-accounts create nova-drive-motors-ingest \
+            --display-name="NovaDriveMotors Ingest" \
+            --project=$_PROJECT_ID
+          _SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list \
+            --filter="displayName:NovaDriveMotors Ingest" \
+            --format="value(email)" \
+            --project=$_PROJECT_ID)
+        fi
+
+  # Terceiro passo: criar a chave de serviço
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ ! -f "/workspace/key.json" ]]; then
+          gcloud iam service-accounts keys create /workspace/key.json \
+            --iam-account=$_SERVICE_ACCOUNT_EMAIL \
+            --project=$_PROJECT_ID
+        fi
+
+  # Quarto passo: executar um script de build
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install']
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
 
-  # Terceiro passo: realizar o deploy
+  # Quinto passo: realizar o deploy
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
 # Configurações adicionais
 options:
   machineType: 'N1_HIGHCPU_8'  # Tipo de máquina para a execução
-  substitution_option: 'ALLOW_LOOSE'  # Opção de substituição permitida
   logging: 'CLOUD_LOGGING_ONLY'  # Opção de logging
 
 # Configuração de substituições (substitutions)
 substitutions:
   _NODE_ENV: 'production'
+  _PROJECT_ID: '$PROJECT_ID'
+  _REGION: 'us-central1'
+  _BUCKET_NAME: '$PROJECT_ID-nova-drive-motors-ingest'
+  _SERVICE_ACCOUNT_EMAIL: '$(_SERVICE_ACCOUNT_EMAIL)'
+  _DEPLOYMENT_NAME: 'nova-drive-motors-ingest'
+  _DEPLOYMENT_REGION: 'us-central1'
+  _DEPLOYMENT_ZONE: 'us-central1-a'
+  _DEPLOYMENT_TIMEOUT: '600'
+  _DEPLOYMENT_MAX_INSTANCES: '1'
+  _DEPLOYMENT_MIN_INSTANCES: '1'
+  _DEPLOYMENT_AUTOSCALE_ENABLED: 'true'
+  _DEPLOYMENT_AUTOSCALE_MIN_INSTANCES: '1'
+  _DEPLOYMENT_AUTOSCALE_MAX_INSTANCES: '10'
+  _DEPLOYMENT_AUTOSCALE_CPU_TARGET: '0.5'
+  _DEPLOYMENT_AUTOSCALE_COOL_DOWN_PERIOD: '60'
+  _DEPLOYMENT_AUTOSCALE_DISK_SIZE_GB: '100'
+  _DEPLOYMENT_AUTOSCALE_DISK_TYPE: 'pd-standard'
+  _DEPLOYMENT_AUTOSCALE_NETWORK_PERFORMANCE_CONFIG: 'DEFAULT'
+  _DEPLOYMENT_AUTOSCALE_MACHINE_TYPE: 'n1-standard-1'
+  _DEPLOYMENT_AUTOSCALE_PREEMPTIBLE: 'false'
+  _DEPLOYMENT_AUTOSCALE_DISK_AUTO_DELETE: 'true'
+  _DEPLOYMENT_AUTOSCALE_DISK_SOURCE_IMAGE: 'centos-cloud/centos-7'
+  _DEPLOYMENT_AUTOSCALE_DISK_BOOT: 'true'
+  _DEPLOYMENT_AUTOSCALE_DISK_MODE: 'READ_WRITE'
+
+# Definindo variáveis de ambiente
+env:
+  - 'GOOGLE_APPLICATION_CREDENTIALS=/workspace/key.json'  # Caminho para a chave de serviço
