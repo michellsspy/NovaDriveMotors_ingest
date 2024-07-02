@@ -1,0 +1,24 @@
+steps:
+  # Primeiro passo: clonar o repositório
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone', 'https://github.com/michellsspy/NovaDriveMotors_ingest.git', '.']
+
+  # Segundo passo: executar um script de build
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+
+  # Terceiro passo: realizar o deploy
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy']
+
+# Configurações adicionais
+options:
+  machineType: 'N1_HIGHCPU_8'  # Tipo de máquina para a execução
+  substitution_option: 'ALLOW_LOOSE'  # Opção de substituição permitida
+  logging: 'CLOUD_LOGGING_ONLY'  # Opção de logging
+
+# Configuração de substituições (substitutions)
+substitutions:
+  _NODE_ENV: 'production'
