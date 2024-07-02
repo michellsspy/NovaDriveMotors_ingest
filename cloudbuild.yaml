@@ -62,7 +62,7 @@ substitutions:
   _PROJECT_ID: 'novadrive-motors-428216'
   _REGION: 'southamerica-east1'
   _BUCKET_NAME: 'novadrive-motors-428216-nova-drive-motors-ingest'
-  _SERVICE_ACCOUNT_EMAIL: '$_SERVICE_ACCOUNT_EMAIL'
+  _SERVICE_ACCOUNT_EMAIL: 'sa-novadrive@novadrive-motors-428216.iam.gserviceaccount.com'
   _DEPLOYMENT_NAME: 'nova-drive-motors-ingest'
   _DEPLOYMENT_REGION: 'southamerica-east1'
   _DEPLOYMENT_ZONE: 'southamerica-east1-a'
