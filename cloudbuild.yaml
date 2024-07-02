@@ -50,10 +50,10 @@ steps:
       - 'app'
       - 'deploy'
       - '--region=southamerica-east1'
+      - '--machine-type=e2-highcpu-8'  # Troquei para um tipo de máquina E2
 
 # Configurações adicionais
 options:
-  machineType: 'N1_HIGHCPU_8'  # Tipo de máquina para a execução
   logging: 'CLOUD_LOGGING_ONLY'  # Opção de logging
 
 # Configuração de substituições (substitutions)
@@ -77,7 +77,7 @@ substitutions:
   _DEPLOYMENT_AUTOSCALE_DISK_SIZE_GB: '100'
   _DEPLOYMENT_AUTOSCALE_DISK_TYPE: 'pd-standard'
   _DEPLOYMENT_AUTOSCALE_NETWORK_PERFORMANCE_CONFIG: 'DEFAULT'
-  _DEPLOYMENT_AUTOSCALE_MACHINE_TYPE: 'n1-standard-1'
+  _DEPLOYMENT_AUTOSCALE_MACHINE_TYPE: 'e2-highcpu-8'  # Tipo de máquina E2
   _DEPLOYMENT_AUTOSCALE_PREEMPTIBLE: 'false'
   _DEPLOYMENT_AUTOSCALE_DISK_AUTO_DELETE: 'true'
   _DEPLOYMENT_AUTOSCALE_DISK_SOURCE_IMAGE: 'centos-cloud/centos-7'
